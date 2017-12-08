@@ -4,7 +4,9 @@ lazy val commonSettings = Seq(
   organization := "com.aerohitsaxena",
   version := "0.1.0-SNAPSHOT",
   scalaVersion := "2.12.4",
-  dockerBaseImage := "openjdk:jre"
+  dockerBaseImage := "openjdk:jre-alpine",
+  scalafmtOnCompile in ThisBuild := true,
+  scalafmtTestOnCompile in ThisBuild := true
 )
 
 lazy val akkaHttpVersion = "10.0.11"
@@ -19,3 +21,4 @@ lazy val backend = (project in file("backend"))
   )
   .enablePlugins(JavaAppPackaging)
   .enablePlugins(DockerPlugin)
+  .enablePlugins(AshScriptPlugin)
