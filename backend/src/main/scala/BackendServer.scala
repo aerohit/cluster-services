@@ -22,7 +22,8 @@ object BackendServer extends App {
       }
     }
 
-  Http().bindAndHandle(route, "localhost", 9000)
+  // if exposed "localhost" only requests from docker container would be accepted
+  Http().bindAndHandle(route, "0.0.0.0", 9000)
 }
 
 case class ServerInfo(hostname: String)
