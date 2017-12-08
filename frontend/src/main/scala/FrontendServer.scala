@@ -29,7 +29,7 @@ object FrontendServer extends App {
   val route =
     path("serverinfo") {
       get {
-        val responseFuture = Http().singleRequest(HttpRequest(uri = backendHostnameUri))
+        val responseFuture = constructResponse()
         onComplete(responseFuture) {
           case Success(response) => complete(response)
           case Failure(ex)       => complete(s"An error occurred: ${ex.getMessage}")
@@ -40,10 +40,22 @@ object FrontendServer extends App {
   // if exposed "localhost" only requests from docker container would be accepted
   Http().bindAndHandle(route, "0.0.0.0", 9100)
 
+  def constructResponse(): Future[ServerResponse] = {
+    getBackendHostname().map(info => ServerResponse(frontendHost = hostName, backendHost = info.hostname))
+  }
+
+  def getBackendHostname(): Future[ServerInfo] = {
+    import akka.http.scaladsl.unmarshalling.Unmarshal
+    val responseFuture = Http().singleRequest(HttpRequest(uri = backendHostnameUri))
+    responseFuture.flatMap(resp => Unmarshal(resp.entity).to[ServerInfo])
+  }
 }
 
+// TODO: this common class should be moved to a common project
+case class ServerInfo(hostname: String)
 case class ServerResponse(frontendHost: String, backendHost: String)
 
 object JsonFormats extends SprayJsonSupport with DefaultJsonProtocol {
-  implicit lazy val serverInfoFormat: RootJsonFormat[ServerResponse] = jsonFormat2(ServerResponse)
+  implicit lazy val serverInfoFormat: RootJsonFormat[ServerInfo]         = jsonFormat1(ServerInfo)
+  implicit lazy val serverResponseFormat: RootJsonFormat[ServerResponse] = jsonFormat2(ServerResponse)
 }
