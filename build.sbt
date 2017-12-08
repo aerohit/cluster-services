@@ -5,6 +5,7 @@ lazy val commonSettings = Seq(
   version := "0.1.0-SNAPSHOT",
   scalaVersion := "2.12.4",
   dockerBaseImage := "openjdk:jre-alpine",
+  dockerUpdateLatest := true,
   scalafmtOnCompile in ThisBuild := true,
   scalafmtTestOnCompile in ThisBuild := true
 )
