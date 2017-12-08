@@ -3,7 +3,8 @@ import Dependencies._
 lazy val commonSettings = Seq(
   organization := "com.aerohitsaxena",
   version := "0.1.0-SNAPSHOT",
-  scalaVersion := "2.12.4"
+  scalaVersion := "2.12.4",
+  dockerBaseImage := "openjdk:jre"
 )
 
 lazy val akkaHttpVersion = "10.0.11"
