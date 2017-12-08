@@ -9,14 +9,15 @@ object BackendServer extends App {
 
   import JsonFormats._
 
-  implicit val system           = ActorSystem("my-system")
+  implicit val system           = ActorSystem("backend-system")
   implicit val materializer     = ActorMaterializer()
   implicit val executionContext = system.dispatcher
 
-  private val hostName = java.net.InetAddress.getLocalHost.getHostName
-  val serverInfo       = ServerInfo(hostName)
+  val hostName   = java.net.InetAddress.getLocalHost.getHostName
+  val serverInfo = ServerInfo(hostName)
+
   val route =
-    path("hello") {
+    path("hostname") {
       get {
         complete(serverInfo)
       }
