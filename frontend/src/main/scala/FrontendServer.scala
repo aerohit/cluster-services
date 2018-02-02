@@ -24,7 +24,8 @@ object FrontendServer extends App {
   val config             = ConfigFactory.load()
   val backendHost        = config.getString("backend.host")
   val backendHostnameUri = s"$backendHost/hostname"
-  val serverInfo         = ServerResponse(frontendHost = hostName, backendHost = backendHost)
+
+  val consulHost = config.getString("consul.host")
 
   val route =
     path("serverinfo") {
@@ -35,10 +36,16 @@ object FrontendServer extends App {
           case Failure(ex)       => complete(s"An error occurred: ${ex.getMessage}")
         }
       }
-    } ~ path("consulinfo") {
+    } ~ path("consulservices") {
       get {
-        val responseFuture = getConsulResponse()
-        onComplete(responseFuture) {
+        onComplete(getConsulServices()) {
+          case Success(response) => complete(response)
+          case Failure(ex)       => complete(s"An error occurred: ${ex.getMessage}")
+        }
+      }
+    } ~ path("consulnodes") {
+      get {
+        onComplete(getConsulServices()) {
           case Success(response) => complete(response)
           case Failure(ex)       => complete(s"An error occurred: ${ex.getMessage}")
         }
@@ -58,9 +65,15 @@ object FrontendServer extends App {
     responseFuture.flatMap(resp => Unmarshal(resp.entity).to[ServerInfo])
   }
 
-  def getConsulResponse(): Future[String] = {
+  def getConsulServices(): Future[String] = {
     import akka.http.scaladsl.unmarshalling.Unmarshal
-    val responseFuture = Http().singleRequest(HttpRequest(uri = "http://consul-server:8500/v1/catalog/datacenters"))
+    val responseFuture = Http().singleRequest(HttpRequest(uri = s"$consulHost/v1/agent/services"))
+    responseFuture.flatMap(resp => Unmarshal(resp.entity).to[String])
+  }
+
+  def getConsulNodes(): Future[String] = {
+    import akka.http.scaladsl.unmarshalling.Unmarshal
+    val responseFuture = Http().singleRequest(HttpRequest(uri = s"$consulHost/v1/catalog/nodes"))
     responseFuture.flatMap(resp => Unmarshal(resp.entity).to[String])
   }
 }

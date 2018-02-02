@@ -4,13 +4,13 @@ import Dependencies._
 // (eg: not every project would be published as docker image)
 lazy val commonSettings = Seq(
   organization := "com.aerohitsaxena",
-  version := "0.1.0-SNAPSHOT",
+  version := "0.1.0",
   scalaVersion := "2.12.4",
   dockerBaseImage := "openjdk:jre-alpine",
   dockerUpdateLatest := true,
   scalafmtOnCompile in ThisBuild := true,
   scalafmtTestOnCompile in ThisBuild := true,
-  dockerRepository := Option("https://hub.docker.com/aerohit")
+  dockerRepository := Option("aerohit")
 )
 
 lazy val akkaHttpVersion = "10.0.11"
