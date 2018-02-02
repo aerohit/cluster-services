@@ -1,0 +1,46 @@
+version: '2'
+
+services:
+  backend-1:
+    image: josdirksen/demo-service
+    container_name: Backend1
+    ports:
+      - 8080:8080
+      - 8081:8081
+    environment:
+      - "constraint:node==n-1"
+      - SERVER_ID=1
+      - SERVERNAME=Server1
+      - PORT=8081
+    command: /entrypoint.sh --type backend
+
+  backend-2:
+    image: josdirksen/demo-service
+    container_name: Backend2
+    ports:
+      - 8080:8080
+      - 8081:8081
+    environment:
+      - "constraint:node==n-2"
+      - SERVER_ID=2
+      - SERVERNAME=Server2
+      - PORT=8081
+    command: /entrypoint.sh --type backend
+
+  backend-3:
+    image: josdirksen/demo-service
+    container_name: Backend3
+    ports:
+      - 8080:8080
+      - 8081:8081
+    environment:
+      - "constraint:node==n-3"
+      - SERVER_ID=3
+      - SERVERNAME=Server3
+      - PORT=8081
+    command: /entrypoint.sh --type backend
+
+networks:
+  default:
+    external:
+      name: my-net

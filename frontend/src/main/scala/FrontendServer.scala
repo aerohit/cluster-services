@@ -35,6 +35,14 @@ object FrontendServer extends App {
           case Failure(ex)       => complete(s"An error occurred: ${ex.getMessage}")
         }
       }
+    } ~ path("consulinfo") {
+      get {
+        val responseFuture = getConsulResponse()
+        onComplete(responseFuture) {
+          case Success(response) => complete(response)
+          case Failure(ex)       => complete(s"An error occurred: ${ex.getMessage}")
+        }
+      }
     }
 
   // if exposed "localhost" only requests from docker container would be accepted
@@ -48,6 +56,12 @@ object FrontendServer extends App {
     import akka.http.scaladsl.unmarshalling.Unmarshal
     val responseFuture = Http().singleRequest(HttpRequest(uri = backendHostnameUri))
     responseFuture.flatMap(resp => Unmarshal(resp.entity).to[ServerInfo])
+  }
+
+  def getConsulResponse(): Future[String] = {
+    import akka.http.scaladsl.unmarshalling.Unmarshal
+    val responseFuture = Http().singleRequest(HttpRequest(uri = "http://consul-server:8500/v1/catalog/datacenters"))
+    responseFuture.flatMap(resp => Unmarshal(resp.entity).to[String])
   }
 }
 

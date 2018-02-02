@@ -9,7 +9,8 @@ lazy val commonSettings = Seq(
   dockerBaseImage := "openjdk:jre-alpine",
   dockerUpdateLatest := true,
   scalafmtOnCompile in ThisBuild := true,
-  scalafmtTestOnCompile in ThisBuild := true
+  scalafmtTestOnCompile in ThisBuild := true,
+  dockerRepository := Option("https://hub.docker.com/aerohit")
 )
 
 lazy val akkaHttpVersion = "10.0.11"
@@ -34,6 +35,19 @@ lazy val frontend = (project in file("frontend"))
     libraryDependencies ++= Seq(
       "com.typesafe.akka" %% "akka-http"            % akkaHttpVersion,
       "com.typesafe.akka" %% "akka-http-spray-json" % akkaHttpVersion
+    )
+  )
+  .enablePlugins(JavaAppPackaging)
+  .enablePlugins(DockerPlugin)
+  .enablePlugins(AshScriptPlugin)
+
+// The idea of this service is that it simply registers with consul on bootup
+lazy val myservice = project
+  .settings(
+    commonSettings,
+    libraryDependencies ++= Seq(
+      "com.typesafe" % "config"       % "1.3.1",
+      "org.scalaj"   %% "scalaj-http" % "2.3.0"
     )
   )
   .enablePlugins(JavaAppPackaging)
